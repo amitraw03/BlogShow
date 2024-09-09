@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('./partials/head') %>
+        <title>signup</title>
+</head>
+
+<body style="background: url(https://media.istockphoto.com/id/922745190/photo/blogging-blog-concepts-ideas-with-worktable.jpg?s=612x612&w=0&k=20&c=xR2vOmtg-N6Lo6_I269SoM5PXEVRxlgvKxXUBMeMC_A=);
+                  background-size: cover;
+                  background-position: center;
+                  width: 100%; height: 600px;">
+    <%- include('./partials/nav') %>
+
+    <div class="container">
+        <form action="/user/signup" method="post">
+            <!-- Full Name Field -->
+            <div class="mb-3 mt-4">
+                <label for="fullName" class="form-label" style="font-style: italic; font-size: x-large;">Full Name</label>
+                <input style="width:50%;" type="text" class="form-control" name="fullName" id="fullName" aria-describedby="fullName">
+            </div>
+            
+            <!-- Email Field -->
+            <div class="mb-3">
+                <label for="exampleInputEmail1" class="form-label" style="font-style: italic; font-size: x-large;">Email address</label>
+                <input style="width:60%;" type="email" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+            </div>
+
+            <!-- Password Field -->
+            <div class="mb-3">
+                <label for="exampleInputPassword1" class="form-label" style="font-style: italic; font-size: x-large;">Password</label>
+                <input style="width:70%;" type="password" name="password" class="form-control" id="exampleInputPassword1">
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary" style="background-color: black; ">Submit</button>
+        </form>
+    </div>
+
+        <%- include('./partials/scripts') %>
+</body>
+
+</html>

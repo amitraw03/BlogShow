@@ -16,12 +16,14 @@ router.post('/signin', async (req, res) => {
     const { email, password } = req.body;
     
     try {
-        const user = await User.matchPassword(email, password); // Match password using bcrypt
-        console.log(user);
-        return res.redirect('/');
-    } catch (error) {
-        console.error(error.message);
-        res.status(400).send('Invalid credentials');
+        const user = await User.matchPasswordAndGenerateToken(email, password); // Match password using bcrypt
+        // console.log(user);
+        return res.cookie('token',token).redirect('/');
+    } 
+    catch (error) {
+        return res.render('signin',{
+            error:'Incorrect Email or Password',
+        });
     }
 });
 

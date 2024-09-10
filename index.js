@@ -3,8 +3,6 @@ const path = require('path');
 const mongoose = require ('mongoose');
 
 const userRoute= require('./routes/user.routes');
-const { log } = require('console');
-const exp = require('constants');
 
 const app= express();
 const PORT = 9000;

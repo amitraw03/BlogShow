@@ -12,11 +12,15 @@ router.get('/signup',(req,res)=>{
     res.render('signup');
 });
 
+router.get('/logout',(req,res)=>{
+    res.clearCookie('token').redirect('signin');
+})
+
 router.post('/signin', async (req, res) => {
     const { email, password } = req.body;
     
     try {
-        const user = await User.matchPasswordAndGenerateToken(email, password); // Match password using bcrypt
+        const {user,token} = await User.matchPasswordAndGenerateToken(email, password); // Match password using bcrypt
         // console.log(user);
         return res.cookie('token',token).redirect('/');
     } 

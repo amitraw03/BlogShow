@@ -7,6 +7,13 @@
 <body>
     <%- include('./partials/nav') %>
     
+    <div class="container mt-4">
+        <% if (user) { %>
+            <p>User: <%= JSON.stringify(user) %></p>
+        <% } else { %>
+            <p>No user is logged in.</p>
+        <% } %>
+    </div>
 
     <%- include('./partials/scripts') %>
 </body>

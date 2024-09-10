@@ -52,7 +52,7 @@ userSchema.static('matchPasswordAndGenerateToken', async function (email, passwo
     if (!isMatch) throw new Error('Incorrect Password !!');
     
     const token= createTokenForUser(user);
-    return token;
+    return {user,token};
 });
 
 const User= model('User',userSchema); 

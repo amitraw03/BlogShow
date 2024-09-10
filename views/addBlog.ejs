@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('./partials/head') %>
+        <title>HomePage</title>
+</head>
+
+<body>
+    <%- include('./partials/nav') %>
+
+        <div class="container mt-3">
+            <form action="/blog" method="post" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label style="font-family:'Franklin Gothic Medium'; font-size:xx-large;" for="title">Title</label>
+                    <input style="width:75%;" name="title" type="text" class="form-control" id="title" placeholder="Topic">
+                </div>
+                <div class="mb-3">
+                    <label style="font-family: 'Franklin Gothic Medium'; font-size:x-large;" for="body">Body</label>
+                    <textarea class="form-control" name="body" placeholder="Write Your content here.." id="body"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label style="font-family: 'Franklin Gothic Medium'; font-size:large;"  for="coverImage">Cover Image</label>
+                    <input style="width: 20%;" name="coverImage" type="file" class="form-control" id="coverImage" placeholder="choose a file">
+                </div>
+                <button style="font-family: serif; font-size: large; background-color: green;" type="submit" class="btn btn-primary">POST</button>
+            </form> 
+        </div>
+
+        <%- include('./partials/scripts') %>
+</body>
+
+</html>

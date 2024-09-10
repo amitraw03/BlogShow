@@ -3,7 +3,7 @@ const { validateToken } = require("../utils/authentication");
 function checkForAuthenticationToken(cookieName) {
     return (req, res, next) => {
         const tokenCookieValue = req.cookies[cookieName];
-        console.log(tokenCookieValue);
+        // console.log(tokenCookieValue); 
         
         if (!tokenCookieValue) {
             req.user = null;  // Set req.user to null if no token

@@ -29,7 +29,7 @@ app.use(checkForAuthenticationToken('token'));
 
 app.get('/', async(req,res)=>{
     // console.log(req.user);
-    const allBlogs = await Blog.find({}); 
+    const allBlogs = await Blog.find({}).sort({ createdAt: -1 }); 
     res.render('home',{  // here i am sending stored user data{which we get from checkAuthToken functn} to ejs files
         user:req?.user,
         blogs:allBlogs,

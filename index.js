@@ -1,54 +1,49 @@
-const express = require('express');
+const express = require ('express');
 require('dotenv').config();
 const path = require('path');
-const mongoose = require('mongoose');
+const mongoose = require ('mongoose');
 const cookieParser = require('cookie-parser');
-const fs = require('fs');
-const Blog = require('./models/blog.models');
-const userRoute = require('./routes/user.routes');
+
+const Blog= require('./models/blog.models')
+
+const userRoute= require('./routes/user.routes');
 const blogRoute = require('./routes/blog.routes');
+
 const { checkForAuthenticationToken } = require('./middlewares/auth');
 
-const app = express();
+const app= express();
 const PORT = process.env.PORT || 9000;
 
-// Ensure 'uploads' directory exists
-const uploadsDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
+//connecting with D.B
+const mongoURL =  process.env.MONGO_URL
 
-// MongoDB connection setup
-const mongoURL = process.env.MONGO_URL;
 mongoose.connect(mongoURL)
-  .then(() => console.log('MongoDB Connected Successfully'))
-  .catch(err => console.error('MongoDB connection error:', err));
+.then(()=> console.log('Mongo DB Connected Successfully'))
+.catch(err => console.error('MongoDB connection error:', err));
 
-// EJS setup for server-side rendering
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+//FOr Server side rendering We r using EJS--
+app.set('view engine','ejs');
+app.set('views', path.resolve('./views'));
 
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
+app.use(express.urlencoded({extended:false}));
+
+app.use(cookieParser());  // required config
 app.use(checkForAuthenticationToken('token'));
 
-// Serve static files from the 'public' directory
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.resolve('./public'))) // necessary to load local images on express server
 
-// Serve uploaded files from the 'uploads' directory
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-app.get('/', async (req, res) => {
-  const allBlogs = await Blog.find({}).sort({ createdAt: -1 });
-  res.render('home', {
-    user: req?.user,
-    blogs: allBlogs,
-  });
+app.get('/', async(req,res)=>{
+    // console.log(req.user);
+    const allBlogs = await Blog.find({}).sort({ createdAt: -1 }); 
+    res.render('home',{  // here i am sending stored user data{which we get from checkAuthToken functn} to ejs files
+        user:req?.user,
+        blogs:allBlogs,
+    });
 });
 
-app.use('/user', userRoute);
-app.use('/blog', blogRoute);
+app.use('/user',userRoute); //handling user routes
+app.use('/blog',blogRoute); //handling blog routes
 
-app.listen(PORT, () => {
-  console.log(`Server started at PORT:${PORT}`);
-});
+app.listen(PORT, ()=>{
+    console.log(`Server started at PORT:${PORT}`); 
+})

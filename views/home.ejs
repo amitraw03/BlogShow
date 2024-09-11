@@ -16,7 +16,7 @@
         <div class="card"
           style="width: 19rem; margin: 25px 10px; box-shadow: 0px 10px 30px rgba(97, 95, 95, 0.5); background-color:black; border-color:yellow; transition: transform 0.3s ease; display: inline-block;"
           onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
-          <img src="<%= blog.coverImageURL %>" class="card-img-top " alt="blog-img">
+          <img src="<%= process.env.NODE_ENV === 'production' ? process.env.RENDER_EXTERNAL_URL : '' %><%= blog.coverImageURL %>" class="card-img-top " alt="blog-img">
           <div class="card-body" style="text-align: center; color: white;  opacity: 60%;">
             <h5 class="card-title">
               <%= blog.title %>

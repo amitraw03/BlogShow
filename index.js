@@ -1,4 +1,5 @@
 const express = require ('express');
+require('dotenv').config();
 const path = require('path');
 const mongoose = require ('mongoose');
 const cookieParser = require('cookie-parser');
@@ -11,19 +12,25 @@ const blogRoute = require('./routes/blog.routes');
 const { checkForAuthenticationToken } = require('./middlewares/auth');
 
 const app= express();
-const PORT = 9000;
+const PORT = process.env.PORT || 9000;
 
-mongoose.connect('mongodb://localhost:27017/blogshow')
+//connecting with D.B
+const mongoURL =  process.env.MONGO_URL
+
+mongoose.connect(mongoURL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
 .then(()=> console.log('Mongo DB Connected Successfully'))
 .catch(err => console.error('MongoDB connection error:', err));
 
-//FOr Server side rendering We r using EJS
+//FOr Server side rendering We r using EJS--
 app.set('view engine','ejs');
 app.set('views', path.resolve('./views'));
 
 app.use(express.urlencoded({extended:false}));
 
-app.use(cookieParser());
+app.use(cookieParser());  // required config
 app.use(checkForAuthenticationToken('token'));
 
 app.use(express.static(path.resolve('./public'))) // necessary to load local images on express server
@@ -37,8 +44,8 @@ app.get('/', async(req,res)=>{
     });
 });
 
-app.use('/user',userRoute);
-app.use('/blog',blogRoute);
+app.use('/user',userRoute); //handling user routes
+app.use('/blog',blogRoute); //handling blog routes
 
 app.listen(PORT, ()=>{
     console.log(`Server started at PORT:${PORT}`); 

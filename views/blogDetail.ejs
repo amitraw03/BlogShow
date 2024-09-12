@@ -16,7 +16,7 @@
         <img src="<%= blog.coverImageURL %>" alt="<%= blog.title %>" style="width: 60%; height: 60%; margin: 0px auto 30px; border-radius: 5%; border-width: 10px;" />
         <pre style="font-size: large; white-space: pre-wrap; word-wrap: break-word; max-width: 100%; overflow-x: hidden; text-align: left;"><%= blog.body %></pre>
         <div class="container mt-4">
-            <img src="<%= blog.createdBy.profileImageURL || '/images/default.png' %>" width="80px" style="border-radius: 50%;"> ~<%= blog.createdBy.fullName %>
+            <img src="<%= blog.createdBy.profileImageURL %>" width="80px" style="border-radius: 50%;"> ~<%= blog.createdBy.fullName %>
         </div>
     </div>
     <div class="container mt-4">

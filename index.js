@@ -38,7 +38,7 @@ app.use(express.urlencoded({extended:false}));
 app.use(cookieParser());  // required config
 app.use(checkForAuthenticationToken('token'));
 
-// app.use(express.static(path.resolve('./public'))) // necessary to load local images on express server 
+app.use(express.static(path.resolve('./public'))) // necessary to load local images on express server 
 
 app.get('/', async(req,res)=>{
     // console.log(req.user);

@@ -1,118 +1,105 @@
-const {Router} = require('express');
-const router=Router();
-const multer=require('multer');
-const path=require('path');
-const fs = require('fs');
+const { Router } = require('express');
+const router = Router();
+const multer = require('multer');
+const cloudinary = require('cloudinary').v2;
+const { Readable } = require('stream');
 
-const Blog= require('../models/blog.models')
-const Comment = require('../models/comment.models')
+const Blog = require('../models/blog.models');
+const Comment = require('../models/comment.models');
 
-// FILE UPLOADING WHILE CREATING A BLOG 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        const userId = req.user ? req.user._id : 'anonymous';
-        const userUploadPath = path.resolve(`./public/uploads/${userId}`);
-        
-        // Create user-specific directory if it doesn't exist
-        fs.mkdirSync(userUploadPath, { recursive: true });
-        
-        cb(null, userUploadPath);
-    },
-    filename: function (req, file, cb) {
-        const today = new Date().toISOString().split('T')[0]; // Gets YYYY-MM-DD
-        const fileName = `${today}-${Date.now()}-${file.originalname}`;
-      cb(null,fileName);
-    },
-});
-const upload = multer({ storage: storage })
-
-
-router.get('/add-new',(req,res)=>{
-    return res.render('addBlog',{
-        user:req.user,
-    })
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-//ADD BLOG
-router.post('/', upload.single('coverImage') ,async(req,res)=>{  // here / means /blog
-    // console.log(req.body);  // all data which we r entering in the form
-    // console.log(req.file);
-    try {
-        const { title, body } = req.body;
-        
-        const blog = await Blog.create({
-            body,
-            title,
-            createdBy: req.user._id,
-            coverImageURL: `/uploads/${req.user._id}/${req.file.filename}`
-        });
+// Configure Multer for memory storage
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
-        // After the blog is created, it will have an _id
-        return res.redirect('/'); // Redirect to the newly created blog's page
-    } catch (error) {
-        console.error('Error creating blog:', error);
-        return res.status(500).send('An error occurred while creating the blog.');
+// Helper function to upload to Cloudinary
+const uploadToCloudinary = (buffer) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { folder: "blog_images" },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result);
+      }
+    );
+    const readableStream = new Readable({
+      read() {
+        this.push(buffer);
+        this.push(null);
+      }
+    });
+    readableStream.pipe(uploadStream);
+  });
+};
+
+router.get('/add-new', (req, res) => {
+  return res.render('addBlog', {
+    user: req.user,
+  });
+});
+
+// ADD BLOG
+router.post('/', upload.single('coverImage'), async (req, res) => {
+  try {
+    const { title, body } = req.body;
+
+    let coverImageURL = '';
+    if (req.file) {
+      const result = await uploadToCloudinary(req.file.buffer);
+      coverImageURL = result.secure_url;
     }
-})
 
-// blogDetail
+    const blog = await Blog.create({
+      body,
+      title,
+      createdBy: req.user._id,
+      coverImageURL
+    });
+
+    return res.redirect('/');
+  } catch (error) {
+    console.error('Error creating blog:', error);
+    return res.status(500).send('An error occurred while creating the blog.');
+  }
+});
+
+// VIEW SINGLE BLOG
 router.get('/:id', async (req, res) => {
     try {
-        const blogId = req.params.id;
-        const blog = await Blog.findById(blogId).populate('createdBy');
-
-        if (!blog) {
-            return res.status(404).send('Blog not found');
-        }
-
-        // Fetch comments along with the blog
-        const comments = await Comment.find({blogId}).populate('createdBy');
-
-        return res.render('blogDetail', {
-            blog,
-            comments,
-            user: req.user,
-        });
+      const blog = await Blog.findById(req.params.id).populate('createdBy');
+      if (!blog) {
+        return res.status(404).send('Blog not found');
+      }
+      const comments = await Comment.find({ blogId: blog._id }).populate('createdBy');
+      res.render('blogDetail', { blog, comments, user: req.user });
     } catch (error) {
-        console.error('Error fetching blog:', error);
-        return res.status(500).send('An error occurred while retrieving the blog.');
+      console.error('Error fetching blog:', error);
+      res.status(500).send('An error occurred while retrieving the blog.');
     }
-});
-
-// COMMENT
-router.post('/comment/:blogId', async(req, res) => {
+  });
+  
+  // ADD COMMENT
+  router.post('/comment/:blogId', async (req, res) => {
     try {
-        const blogId = req.params.blogId;
-        
-        // Create the comment
-        const newComment = await Comment.create({
-            content: req.body.content,
-            blogId: blogId,
-            createdBy: req.user._id,
-        });
-
-        // Populate the createdBy field
-        await newComment.populate('createdBy');
-        
-        // If it's an AJAX request, send back the new comment data
-        if (req.xhr || req.headers.accept.indexOf('json') > -1) {
-            return res.json({
-                success: true,
-                comment: newComment
-            });
-        } else {
-            // For non-AJAX requests, redirect (fallback)
-            return res.redirect(`/blog/${blogId}`);
-        }
+      const { blogId } = req.params;
+      const { content } = req.body;
+      const comment = await Comment.create({
+        content,
+        blogId,
+        createdBy: req.user._id
+      });
+      await comment.populate('createdBy');
+      res.json({ success: true, comment });
     } catch (error) {
-        console.error('Error adding comment:', error);
-        if (req.xhr || req.headers.accept.indexOf('json') > -1) {
-            return res.status(500).json({ success: false, message: 'Error adding comment' });
-        } else {
-            return res.redirect(`/blog/${blogId}`);
-        }
+      console.error('Error adding comment:', error);
+      res.status(500).json({ success: false, message: 'Error adding comment' });
     }
-});
+  });
 
-
-module.exports=router;
+module.exports = router;

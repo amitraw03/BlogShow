@@ -11,6 +11,14 @@ const blogRoute = require('./routes/blog.routes');
 
 const { checkForAuthenticationToken } = require('./middlewares/auth');
 
+const cloudinary = require('cloudinary').v2;
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
 const app= express();
 const PORT = process.env.PORT || 9000;
 
@@ -30,7 +38,7 @@ app.use(express.urlencoded({extended:false}));
 app.use(cookieParser());  // required config
 app.use(checkForAuthenticationToken('token'));
 
-app.use(express.static(path.resolve('./public'))) // necessary to load local images on express server
+// app.use(express.static(path.resolve('./public'))) // necessary to load local images on express server 
 
 app.get('/', async(req,res)=>{
     // console.log(req.user);

@@ -4,6 +4,7 @@ const path = require('path');
 const mongoose = require ('mongoose');
 const cookieParser = require('cookie-parser');
 
+//importing
 const Blog= require('./models/blog.models')
 
 const userRoute= require('./routes/user.routes');
@@ -11,6 +12,7 @@ const blogRoute = require('./routes/blog.routes');
 
 const { checkForAuthenticationToken } = require('./middlewares/auth');
 
+//Required Cloudinary Config
 const cloudinary = require('cloudinary').v2;
 
 cloudinary.config({
@@ -42,7 +44,7 @@ app.use(checkForAuthenticationToken('token'));
 
 app.get('/', async(req,res)=>{
     // console.log(req.user);
-    const allBlogs = await Blog.find({}).sort({ createdAt: -1 }); 
+    const allBlogs = await Blog.find({}).sort({ createdAt: -1 });  // extracting after creation of Blog ion D.B and passing
     res.render('home',{  // here i am sending stored user data{which we get from checkAuthToken functn} to ejs files
         user:req?.user,
         blogs:allBlogs,

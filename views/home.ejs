@@ -1,41 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <%- include('./partials/head') %>
-    <title>BlogPage</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlogShow</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ffd700;
+            --dark-bg: #121212;
+            --card-bg: rgba(18, 18, 18, 0.95);
+        }
+
+        body {
+            /*  Modern gradient background */
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+
+            
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .blog-container {
+            padding: 2rem 1rem;
+        }
+
+        .blog-card {
+            background-color: var(--card-bg);
+            border: 2px solid var(--primary-color);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+            backdrop-filter: blur(5px);
+        }
+
+        .blog-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.2);
+        }
+
+        .card-img-top {
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .card-title {
+            color: var(--primary-color);
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .card-text {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            color: var(--dark-bg);
+            font-weight: bold;
+            padding: 0.5rem 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-color);
+            color: var(--dark-bg);
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+
+        /* Make sure navbar text is white */
+        .navbar-nav .nav-link {
+            color: #fff !important;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+
+        @media (max-width: 768px) {
+            .blog-container {
+                padding: 1rem 0.5rem;
+            }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--dark-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 215, 0, 0.8);
+        }
+    </style>
 </head>
+<body>
+    <%- include('./partials/nav') %>
 
-<body style="background: url(https://img.freepik.com/free-vector/black-yellow-grunge-background_1409-1587.jpg);
-            background-size: cover;
-            background-position: center; 
-            width: 100%; height:auto;">
-  <%- include('./partials/nav') %>
-    <div class="container mt-4 mx-4" style="display: flex; flex-wrap: wrap;">
-
-      <% blogs.forEach(blog=> { %>
-        <div class="card"
-          style="width: 19rem; margin: 25px 10px; box-shadow: 0px 10px 30px rgba(97, 95, 95, 0.5); background-color:black; border-color:yellow; transition: transform 0.3s ease; display: inline-block;"
-          onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
-          <img src="<%= blog.coverImageURL %>" class="card-img-top " alt="blog-img">
-          <div class="card-body" style="text-align: center; color: white;  opacity: 60%;">
-            <h5 class="card-title">
-              <%= blog.title %>
-            </h5>
-            <p class="card-text">
-              <%= blog.body.substring(0, 100) %>....
-            </p>
-            <p>Date: <%= blog.createdAt.toDateString() %>
-            </p>
-            <a href="/blog/<%= blog._id %>" class="btn btn-primary"
-              style="font-family:serif; font-size:medium;">VIEW</a>
-          </div>
+    <!-- Blog Cards -->
+    <div class="container blog-container">
+        <div class="row g-4">
+            <% blogs.forEach(blog => { %>
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="blog-card">
+                        <img src="<%= blog.coverImageURL %>" class="card-img-top" alt="blog-img">
+                        <div class="card-body">
+                            <h5 class="card-title"><%= blog.title %></h5>
+                            <p class="card-text"><%= blog.body.substring(0, 100) %>...</p>
+                            <p class="text-muted mb-4">
+                                <%= blog.createdAt.toDateString() %>
+                            </p>
+                            <a href="/blog/<%= blog._id %>" class="btn btn-primary">VIEW</a>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
         </div>
-        <% }) %>
-        
     </div>
 
-    <%- include('./partials/scripts') %>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>
